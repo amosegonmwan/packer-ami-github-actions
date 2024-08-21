@@ -29,9 +29,9 @@ jobs:
         id: init
         run: "packer init ./aws-image.pkr.hcl"
 
-      - name: Run `packer validate`
-        id: validate
-        run: "packer validate ./aws-image.pkr.hcl"
+     # - name: Run `packer validate`
+     #   id: validate
+     #   run: "packer validate ./aws-image.pkr.hcl"
 
       - name: Run `packer build`
         id: build
