@@ -1,46 +1,56 @@
-packer {
-  required_plugins {
-    amazon = {
-      source  = "github.com/hashicorp/amazon"
-      version = "~> 1"
-    }
-  }
-}
+name: Packer AMI Workflow
 
-source "amazon-ebs" "ubuntu" {
-  ami_name      = "${var.ami_prefix}-${local.timestamp}"
-  instance_type = var.instance_type
-  region        = var.region
-  ami_regions   = var.ami_regions
-  source_ami_filter {
-    filters = {
-      name                = "ubuntu/images/*ubuntu-jammy-22.04-amd64-server-*"
-      root-device-type    = "ebs"
-      virtualization-type = "hvm"
-    }
-    most_recent = true
-    owners      = ["099720109477"]
-  }
-  ssh_username = "ubuntu"
-  tags         = var.tags
-}
+on:
+  push:
+    branches:
+      - main
 
-build {
-  sources = [
-    "source.amazon-ebs.ubuntu"
-  ]
+env:
+  PRODUCT_VERSION: "latest" 
+  AWS_ACCESS_KEY_ID: ${{ secrets.AWS_KEY_ID }}
+  AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-  provisioner "shell" {
-    inline = [
-      "echo Installing Updates",
-      "sudo apt-get update -y",
-      "sudo apt-get upgrade -y",
-      "sudo apt-get install -y nginx"
-    ]
-  }
-  post-processor "manifest" {}
-}
+jobs:
+  packer-build:
+    name: Run Packer
+    runs-on: ubuntu-latest
 
-locals {
-  timestamp = regex_replace(timestamp(), "[- TZ:]", "")
-}
+    steps:
+      - name: Checkout 
+        uses: actions/checkout@v4
+
+      - name: Setup `packer`
+        uses: hashicorp/setup-packer@main
+        id: setup
+        with:
+          version: ${{ env.PRODUCT_VERSION }}
+
+      - name: Run `packer init`
+        id: init
+        run: "packer init ./aws-image.pkr.hcl"
+
+      - name: Run `packer validate`
+        id: validate
+        run: "packer validate ./aws-image.pkr.hcl"
+
+      - name: Run `packer build`
+        id: build
+        run: "packer build ./aws-image.pkr.hcl"
+
+  s3-upload:
+    name: Upload manifest to S3
+    needs: [packer-build]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout 
+        uses: actions/checkout@v4
+
+      - name: Upload to S3
+        uses: shallwefootball/s3-upload-action@master
+        with:
+          aws_key_id: ${{ secrets.AWS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws_bucket: ${{ secrets.AWS_BUCKET }}
+          source_dir: './packer-manifest.json'
+          destination_dir: 'packer-manifest/packer-manifest.json'
