@@ -27,22 +27,22 @@ jobs:
 
       - name: Run `packer init`
         id: init
-        run: "packer init ./aws-image.pkr.hcl"
+        run: "packer init ."
 
       - name: Run `packer fmt`
         id: fmt
-        run: "packer fmt ./aws-image.pkr.hcl"
-        
+        run: "packer fmt ."
+
       - name: List Files
         run: ls -la
 
       - name: Run `packer validate`
         id: validate
-        run: "packer validate ./aws-image.pkr.hcl"
+        run: "packer validate ."
 
       - name: Run `packer build`
         id: build
-        run: "packer build ./aws-image.pkr.hcl"
+        run: "packer build ."
 
   s3-upload:
     name: Upload manifest to S3
