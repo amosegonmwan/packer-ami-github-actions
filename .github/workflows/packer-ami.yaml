@@ -44,9 +44,35 @@ jobs:
       - name: List Files
         run: ls -la
 
+  terraform-run:
+    name: Run terraform
+    needs: [packer-build]
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout 
+        uses: actions/checkout@v4
+
+      - name: Setup terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: "1.1.7"
+
+      - name: 'terraform init'
+        run: terraform init
+
+      - name: 'terraform format'
+        run: terraform fmt -recursive
+
+      - name: 'terraform plan' 
+        run: terraform plan
+
+      - name: apply 
+        run: terraform destroy --auto-approve
+        
+        
   s3-upload:
     name: Upload manifest to S3
-    needs: [packer-build]
+    needs: [terraform-run]
     runs-on: ubuntu-latest
 
     steps:
@@ -60,7 +86,7 @@ jobs:
         uses: shallwefootball/s3-upload-action@v1.0.0
         with:
           aws_key_id: ${{ secrets.AWS_KEY_ID }}
-          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws_secret_access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws_bucket: ${{ secrets.AWS_BUCKET }}
           source_dir:   './aws-image.pkr.hcl'   # './packer-manifest.json'
   
