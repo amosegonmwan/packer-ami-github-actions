@@ -33,9 +33,6 @@ jobs:
         id: fmt
         run: "packer fmt ."
 
-      - name: List Files
-        run: ls -la
-
       - name: Run `packer validate`
         id: validate
         run: "packer validate ."
@@ -43,6 +40,9 @@ jobs:
       - name: Run `packer build`
         id: build
         run: "packer build ."
+        
+      - name: List Files
+        run: ls -la
 
   s3-upload:
     name: Upload manifest to S3

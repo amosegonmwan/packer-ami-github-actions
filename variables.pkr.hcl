@@ -21,8 +21,8 @@ variable "ami_regions" {
 variable "tags" {
   type = map(string)
   default = {
-    "Name"        = "MyUbuntuImage"
-    "Environment" = "Production"
+    "Name"        = "Ubuntu-AMI"
+    "Environment" = "Development"
     "OS_Version"  = "Ubuntu 22.04"
     "Release"     = "Latest"
     "Created-by"  = "Packer"
