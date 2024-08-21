@@ -32,6 +32,9 @@ jobs:
       - name: Run `packer fmt`
         id: fmt
         run: "packer fmt ./aws-image.pkr.hcl"
+        
+      - name: List Files
+        run: ls -la
 
       - name: Run `packer validate`
         id: validate
