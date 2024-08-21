@@ -62,6 +62,5 @@ jobs:
           aws_key_id: ${{ secrets.AWS_KEY_ID }}
           aws_secret_access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws_bucket: ${{ secrets.AWS_BUCKET }}
-          source_dir:   './aws-image.pkr.hcl'                         # './packer-manifest.json'
-          destination_dir: 'packer-config/aws-image.pkr.hcl'         # 'packer-manifest/packer-manifest.json'
-      
+          source_dir:   './aws-image.pkr.hcl'   # './packer-manifest.json'
+  
