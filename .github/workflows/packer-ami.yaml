@@ -68,6 +68,9 @@ jobs:
 
       - name: apply 
         run: terraform destroy --auto-approve
+
+      - name: List Files
+        run: ls -l
         
 
   s3-upload:
@@ -78,9 +81,6 @@ jobs:
     steps:
       - name: Checkout 
         uses: actions/checkout@v4
-      
-      - name: List Files
-        run: ls -la
 
       - name: Upload to S3
         uses: shallwefootball/s3-upload-action@v1.0.0
@@ -88,5 +88,5 @@ jobs:
           aws_key_id: ${{ secrets.AWS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
           aws_bucket: ${{ secrets.AWS_BUCKET }}
-          source_dir:   './aws-image.pkr.hcl'   # './packer-manifest.json'
+          source_dir:   './packer-manifest.json'   # './packer-manifest.json'
   
