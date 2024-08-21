@@ -29,9 +29,13 @@ jobs:
         id: init
         run: "packer init ./aws-image.pkr.hcl"
 
-     # - name: Run `packer validate`
-     #   id: validate
-     #   run: "packer validate ./aws-image.pkr.hcl"
+      - name: Run `packer fmt`
+        id: fmt
+        run: "packer fmt ./aws-image.pkr.hcl"
+
+      - name: Run `packer validate`
+        id: validate
+        run: "packer validate ./aws-image.pkr.hcl"
 
       - name: Run `packer build`
         id: build
@@ -45,9 +49,12 @@ jobs:
     steps:
       - name: Checkout 
         uses: actions/checkout@v4
+      
+      - name: List Files
+        run: ls -la
 
       - name: Upload to S3
-        uses: shallwefootball/s3-upload-action@master
+        uses: shallwefootball/s3-upload-action@main
         with:
           aws_key_id: ${{ secrets.AWS_KEY_ID }}
           aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
