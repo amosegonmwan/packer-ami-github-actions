@@ -41,8 +41,14 @@ jobs:
         id: build
         run: "packer build ."
 
-      - name: List Files
-        run: ls -l
+      - name: List Files (once)
+        run: cp  -l
+
+      - name: Copy Files
+        run: cp manifest.json packer-manifest.json
+
+      - name: List Files (again)
+        run: cp  -l
 
   terraform-run:
     name: Run terraform
