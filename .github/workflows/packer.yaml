@@ -73,32 +73,21 @@ jobs:
         run: ls -l
         
   s3-upload:
-    name: S3 Upload
+    name: Upload manifest to S3
     needs: [terraform-run]
     runs-on: ubuntu-latest
+
     steps:
-    - uses: actions/checkout@v4
+      - name: Checkout 
+        uses: actions/checkout@v4
       
-    - name: Setup AWS CLI
-      uses: aws-actions/configure-aws-credentials@v2
-      with:
-        aws-access-key-id: ${{ secrets.AWS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: 'us-west-2'
-      
-    - name: Prepare temporary directory
-      run: |
-        mkdir -p temp-upload
-        cp public/specific-file.txt temp-upload/
-      
-    - name: Sync specific file to S3
-      uses: jakejarvis/s3-sync-action@v0.9.1
-      with:
-        args: --delete
-        source-dir: 'temp-upload'
-      env:
-        AWS_S3_BUCKET: ${{ secrets.AWS_BUCKET }}
-        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_KEY_ID }}
-        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        AWS_REGION: 'us-west-2'
-              
+      - name: List Files
+        run: ls -ls
+
+      - name: Upload to S3
+        uses: shallwefootball/s3-upload-action@master
+        with:
+          aws_key_id: ${{ secrets.AWS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws_bucket: ${{ secrets.AWS_BUCKET }}
+          source_dir: './'
