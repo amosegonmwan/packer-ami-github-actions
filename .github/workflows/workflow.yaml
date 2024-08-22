@@ -41,16 +41,34 @@ jobs:
         id: build
         run: "packer build ."
 
-      - name: List Files (packer)
-        run: ls -l
+      - name: Create artifact directory
+        run: mkdir artifact-dir
+
+      - name: Move packer manifest
+        run: mv packer-manifest.json artifact-dir/
+
+      - name: Save packer manifest as artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: packer-manifest
+          path: artifact-dir/packer-manifest.json
+
+      - name: List Files in artifact-dir
+        run: ls -l artifact-dir
 
   terraform-run:
     name: Run terraform
     needs: [packer-build]
     runs-on: ubuntu-latest
     steps:
-      - name: checkout 
+      - name: Checkout 
         uses: actions/checkout@v4
+
+      - name: Download packer manifest
+        uses: actions/download-artifact@v3
+        with:
+          name: packer-manifest
+          path: ./artifact-dir  # Download to artifact-dir
 
       - name: Setup terraform
         uses: hashicorp/setup-terraform@v3
@@ -69,9 +87,6 @@ jobs:
       - name: 'terraform apply'
         run: terraform apply --auto-approve
 
-      - name: List Files  (terraform)
-        run: ls -l
-        
   s3-upload:
     name: Upload manifest to S3
     needs: [terraform-run]
@@ -79,8 +94,8 @@ jobs:
 
     permissions:
       contents: write  
-      packages: write  # Modify as needed
-      actions: write   # Modify as needed
+      packages: write
+      actions: write
     
     env:
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -89,14 +104,14 @@ jobs:
       - name: Checkout 
         uses: actions/checkout@v4
 
-      - name: Create directory
-        run: mkdir manifest-dir
+      - name: Download packer manifest
+        uses: actions/download-artifact@v3
+        with:
+          name: packer-manifest
+          path: ./artifact-dir  # Download to artifact-dir
 
-      - name: List files (S3-upload)
-        run: ls -l 
-
-      - name: Copy manifest files
-        run: cp  main.tf  manifest-dir
+      - name: List files in artifact-dir
+        run: ls -l artifact-dir
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v2
@@ -106,4 +121,4 @@ jobs:
           aws-region: us-west-2
 
       - name: Upload to S3
-        run: aws s3 sync manifest-dir s3://${{ secrets.AWS_BUCKET }}
+        run: aws s3 sync artifact-dir s3://${{ secrets.AWS_BUCKET }}
