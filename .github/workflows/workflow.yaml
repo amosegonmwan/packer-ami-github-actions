@@ -1,11 +1,11 @@
 name: Packer AMI Automation (GitHub Actions)
 
 on:
-  push:
-    branches:
-      - main
+#  push:
+#    branches:
+#      - main
   workflow_dispatch:
-    
+
 env:
   PRODUCT_VERSION: "latest" 
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_KEY_ID }}
