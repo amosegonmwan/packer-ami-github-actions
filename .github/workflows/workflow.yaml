@@ -77,23 +77,33 @@ jobs:
     needs: [terraform-run]
     runs-on: ubuntu-latest
 
+    permissions:
+      contents: write  
+      packages: write  # Modify as needed
+      actions: write   # Modify as needed
+    
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
     steps:
       - name: Checkout 
-        uses: actions/checkout@main
-
-      - name: List files (S3-upload)
-        run: ls -l 
+        uses: actions/checkout@v4
 
       - name: Create directory
         run: mkdir manifest-dir
 
+      - name: List files (S3-upload)
+        run: ls -l 
+
       - name: Copy manifest files
-        run: cp  packer-manifest.json  manifest-dir
+        run: cp  main.tf  manifest-dir
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-west-2
 
       - name: Upload to S3
-        uses: shallwefootball/s3-upload-action@main
-        with:
-          aws_key_id: ${{ secrets.AWS_KEY_ID }}
-          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws_bucket: ${{ secrets.AWS_BUCKET }}
-          source_dir: 'manifest-dir'
+        run: aws s3 sync manifest-dir s3://${{ secrets.AWS_BUCKET }}
