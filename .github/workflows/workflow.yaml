@@ -41,13 +41,7 @@ jobs:
         id: build
         run: "packer build ."
 
-      - name: List Files (once)
-        run: ls -l
-
-      - name: Copy Files
-        run: cp manifest.json packer-manifest.json
-
-      - name: List Files (again)
+      - name: List Files (packer)
         run: ls -l
 
   terraform-run:
@@ -75,7 +69,7 @@ jobs:
       - name: 'terraform apply'
         run: terraform apply --auto-approve
 
-      - name: List Files in Terraform
+      - name: List Files  (terraform)
         run: ls -l
         
   s3-upload:
@@ -86,7 +80,10 @@ jobs:
     steps:
       - name: Checkout 
         uses: actions/checkout@main
-      
+
+      - name: List files (S3-upload)
+        run: ls -l 
+
       - name: Create directory
         run: mkdir manifest-dir
 
