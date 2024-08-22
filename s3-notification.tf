@@ -22,7 +22,7 @@ provider "aws" {
 #########################################################
 # Reference to the existing S3 bucket using a data source
 data "aws_s3_bucket" "dev_artifacts_repo" {
-  bucket = "dev-artifacts-repo"
+  bucket = "sandbox-artifacts-repository"
 }
 
 # Create an SNS topic
