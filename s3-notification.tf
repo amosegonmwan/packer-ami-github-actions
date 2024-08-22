@@ -19,15 +19,19 @@ provider "aws" {
   region = "us-west-2"
 }
 
-
 # Data source to reference the existing S3 bucket:
 data "aws_s3_bucket" "existing_bucket" {
   bucket = "dev-artifacts-repo"
 }
 
-# Define the SNS Topic:
+# Create the SNS Topic without a policy
 resource "aws_sns_topic" "s3_notification_topic" {
   name = "packer-aws-ami-with-git-actions"
+}
+
+# Create the SNS Topic Policy separately
+resource "aws_sns_topic_policy" "s3_notification_topic_policy" {
+  arn = aws_sns_topic.s3_notification_topic.arn
 
   policy = <<POLICY
 {
@@ -50,7 +54,6 @@ resource "aws_sns_topic" "s3_notification_topic" {
 }
 POLICY
 }
-
 
 # Subscribe an Email to the SNS Topic:
 resource "aws_sns_topic_subscription" "email_subscription" {
