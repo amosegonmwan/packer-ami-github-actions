@@ -39,7 +39,7 @@ resource "aws_sns_topic" "s3_notification_topic" {
         "AWS": "*"
       },
       "Action": "SNS:Publish",
-      "Resource": "${aws_sns_topic.topic.arn}",
+      "Resource": "${aws_sns_topic.s3_notification_topic.arn}",
       "Condition": {
         "ArnLike": {
           "aws:SourceArn": "${data.aws_s3_bucket.existing_bucket.arn}"
