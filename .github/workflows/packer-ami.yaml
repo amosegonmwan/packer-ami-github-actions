@@ -69,7 +69,7 @@ jobs:
       - name: 'terraform apply'
         run: terraform destroy --auto-approve
 
-      - name: List Files
+      - name: List Files in Terraform
         run: ls -l
         
 
@@ -81,6 +81,9 @@ jobs:
     steps:
       - name: Checkout 
         uses: actions/checkout@v4
+
+      - name: List Files in Ready to S3
+        run: ls -l
 
       - name: Check if manifest exists
         run: |
