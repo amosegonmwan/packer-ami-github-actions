@@ -4,7 +4,8 @@ on:
   push:
     branches:
       - main
-
+  workflow_dispatch:
+    
 env:
   PRODUCT_VERSION: "latest" 
   AWS_ACCESS_KEY_ID: ${{ secrets.AWS_KEY_ID }}
